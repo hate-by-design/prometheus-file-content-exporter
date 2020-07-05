@@ -1,8 +1,6 @@
 # Prometheus exporter for watching file content
 
-## Forked from https://github.com/spreaker/prometheus-file-content-exporter
-
-
+Forked from https://github.com/spreaker/prometheus-file-content-exporter
 
 ## How it works
 
@@ -20,15 +18,6 @@ file_exporter_filename{instance="file-exporter:9111",job="file-exporter",key="ne
 ```
 Dockerfile included
 
-## How to install
-
-```
-pip3 install prometheus-file-content-exporter
-```
-
-This will give you `prometheus-file-content-exporter` command line that you can run.
-
-
 ## How to run it
 
 Exporter need `yaml` as configuration.  
@@ -45,18 +34,6 @@ files:
 - /var/svn/main/db/current
 - /tmp/test
 ```
-
-## Example exporter output
-```
-file_content_tmp_test{file="/tmp/test"} 1123.0
-```
-
-
-### How to publish a new version
-
-1. [Release new version on GitHub](https://github.com/spreaker/prometheus-file-content-exporter/releases)
-2. Update version in `setup.py`
-3. Run `python3 setup.py sdist upload -r pypi`
 
 ## License
 
