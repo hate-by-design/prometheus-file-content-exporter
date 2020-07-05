@@ -2,6 +2,8 @@ import logging
 import os
 import signal
 import time
+import re
+import pprint
 
 import sys
 from prometheus_client import start_http_server, REGISTRY
@@ -9,17 +11,18 @@ from prometheus_client.core import GaugeMetricFamily
 from pythonjsonlogger import jsonlogger
 
 # configuration
-from .config import Config
+from config import Config
 
 EXPORTER_PORT = int(os.environ.get('EXPORTER_PORT', 9100))
 EXPORTER_CONFIG = os.environ.get('EXPORTER_CONFIG', '')
-PREFIX = 'file_content'
+PREFIX = 'file_exporter'
+
 # logging
 log = logging.getLogger(__name__)
 logHandler = logging.StreamHandler()
 formatter = jsonlogger.JsonFormatter(
     '(asctime) (levelname) (message) (funcName)',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt='%Y-%m-%d %H:%M:%S',    
 )
 logHandler.setFormatter(formatter)
 log.setLevel(logging.INFO)
@@ -33,38 +36,42 @@ class FileContentMetricsCollector:
     def collect(self):
         metrics = {}
         metrics.update(self._create_metrics())
-
-        for name, data in metrics.items():
-            gauge_name = f'{PREFIX}{name}'
-            gauge = GaugeMetricFamily(gauge_name.replace('/', '_'), '', labels=data.get('labels', []))
-            value = data['metrics']['value']
-            labels = data['labels'] if 'labels' in data else {}
-
-            gauge.add_metric(value=value, labels=labels.values())
+        
+        
+        for _, data in metrics.items():
+            filename = os.path.basename(data['labels']['file'])
+            gauge = GaugeMetricFamily(f"{PREFIX}_{filename}", '', labels=['key'])
+            
+            for metric in data['metrics']:
+                metric_name, metric_value = metric                                
+                gauge.add_metric(value = metric_value, labels=[metric_name]) 
             yield gauge
 
     @staticmethod
     def _check_file(file):
         with open(file, 'r') as f:
-            content = f.readline()
+            content = f.read().splitlines()
+
         return content
 
     def _create_metrics(self):
         data = dict()
         for file in self.files:
             try:
-                value = float(self._check_file(file))
+                file_content = self._check_file(file)
             except ValueError:
-                log.error(f"Couldn't get int from file {file}!")
+                log.error(f"Couldn't get data from {file}!")
                 continue
 
-            data[file] = dict()
-            data[file]['labels'] = {
-                'file': file
-            }
-            data[file]['metrics'] = {
-                'value': value,
-            }
+            data[file] = {}
+            data[file]['labels'] = {'file': file}
+            data[file]['metrics'] = []
+            for metric_line in file_content:
+                # It should be key=value
+                if re.match(r".+\=\d+", metric_line):
+                    name, value = metric_line.split("=")
+
+                    data[file]['metrics'].append((name, value))                                             
 
         return data
 

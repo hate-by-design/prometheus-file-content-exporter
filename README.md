@@ -1,9 +1,22 @@
 # Prometheus exporter for watching file content
 
+## Forked from https://github.com/spreaker/prometheus-file-content-exporter
+
+
+
 ## How it works
 
-You give a list to this exporter and it reads first line of the file if it exists.  
-If the first line can be converted to integer then it's exported.
+You give a list to this exporter and it reads file content if file exists.  
+File should include strings in following format:
+key=1
+next_key=2
+...
+It's content will be exported in metrics like:
+```
+file_exporter_filename{instance="file-exporter:9111",job="file-exporter",key="key"} 1
+file_exporter_filename{instance="file-exporter:9111",job="file-exporter",key="next_key"} 2
+```
+Dockerfile included
 
 ## How to install
 
