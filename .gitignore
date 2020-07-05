@@ -1,6 +1,0 @@
-.idea
-dist
-prometheus_file_content_exporter.egg-info
-*.pyc
-build
-
