@@ -8,8 +8,10 @@
 
 You give a list to this exporter and it reads file content if file exists.  
 File should include strings in following format:
+```
 key=1
 next_key=2
+```
 ...
 It's content will be exported in metrics like:
 ```
