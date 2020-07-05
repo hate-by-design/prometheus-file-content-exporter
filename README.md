@@ -11,8 +11,8 @@ File should include strings in following format:
 ```
 key=1
 next_key=2
+... 
 ```
-...
 It's content will be exported in metrics like:
 ```
 file_exporter_filename{instance="file-exporter:9111",job="file-exporter",key="key"} 1
