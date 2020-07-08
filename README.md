@@ -4,7 +4,7 @@ Forked from https://github.com/spreaker/prometheus-file-content-exporter
 
 ## How it works
 
-You give a list to this exporter and it reads file content if file exists.  
+You give a list of files to this exporter and it reads file content if file exists.  
 File should include strings in following format:
 ```
 key=1
